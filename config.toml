@@ -13,3 +13,8 @@ fullscreen = false   # true = démarre en plein écran ; F11 bascule à tout mom
 
 [aruco]
 dictionary = "DICT_4X4_50"
+
+[grid]
+rows    = 8
+cols    = 32
+cell_px = 64   # résolution en pixels d'une cellule dans l'image rectifiée
