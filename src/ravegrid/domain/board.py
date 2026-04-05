@@ -45,6 +45,14 @@ class MarkerDetection:
 
 
 @dataclass
+class CellState:
+    """État d'une case de la grille : position + couleur du jeton détecté (None = vide)."""
+    row:   int
+    col:   int
+    color: str | None   # None = case vide ; "yellow", "red", "green"… sinon
+
+
+@dataclass
 class BoardCorners:
     """Les 4 corners intérieurs des marqueurs, prêts pour la perspective transform."""
 

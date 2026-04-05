@@ -1,20 +1,38 @@
 [camera]
-# Index OpenCV de la caméra (0 = première caméra disponible).
-# Ignoré si l'utilisateur en choisit une autre en mode interactif.
 index = 0
-width  = 1280
+width = 1280
 height = 720
 
 [window]
-title      = "RaveGrid"
-width      = 1280
-height     = 720
-fullscreen = false   # true = démarre en plein écran ; F11 bascule à tout moment
+title = "RaveGrid"
+width = 1280
+height = 720
+fullscreen = false
 
 [aruco]
 dictionary = "DICT_4X4_50"
 
 [grid]
-rows    = 8
-cols    = 32
-cell_px = 64   # résolution en pixels d'une cellule dans l'image rectifiée
+rows = 8
+cols = 32
+cell_px = 64
+
+[colors]
+min_fill_ratio = 0.3
+center_crop = 0.6
+
+[colors.yellow]
+h_min = 16
+h_max = 30
+s_min = 28
+s_max = 255
+v_min = 89
+v_max = 255
+
+[colors.red]
+h_min = 171
+h_max = 179
+s_min = 50
+s_max = 255
+v_min = 97
+v_max = 255
