@@ -10,3 +10,6 @@ title      = "RaveGrid"
 width      = 1280
 height     = 720
 fullscreen = false   # true = démarre en plein écran ; F11 bascule à tout moment
+
+[aruco]
+dictionary = "DICT_4X4_50"

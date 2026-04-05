@@ -21,6 +21,12 @@ class WindowConfig:
 
 
 @dataclass
+class ArucoConfig:
+    dictionary: str = "DICT_4X4_50"
+
+
+@dataclass
 class AppConfig:
     camera: CameraConfig = field(default_factory=CameraConfig)
     window: WindowConfig = field(default_factory=WindowConfig)
+    aruco: ArucoConfig = field(default_factory=ArucoConfig)
