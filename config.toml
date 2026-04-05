@@ -1,0 +1,12 @@
+[camera]
+# Index OpenCV de la caméra (0 = première caméra disponible).
+# Ignoré si l'utilisateur en choisit une autre en mode interactif.
+index = 0
+width  = 1280
+height = 720
+
+[window]
+title      = "RaveGrid"
+width      = 1280
+height     = 720
+fullscreen = false   # true = démarre en plein écran ; F11 bascule à tout moment

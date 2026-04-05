@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ravegrid"
+version = "0.1.0"
+description = "Vision OpenCV — développement Windows, exécution Raspberry Pi"
+requires-python = ">=3.10"
+dependencies = [
+    "opencv-python>=4.8,<5",
+    "pygame>=2.5",
+    "tomli>=2.0 ; python_version < '3.11'",
+]
+
+[project.scripts]
+ravegrid = "ravegrid.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Sur Raspberry Pi sans interface graphique, remplacer par headless :
+#   pip uninstall -y opencv-python && pip install "opencv-python-headless>=4.8,<5"
