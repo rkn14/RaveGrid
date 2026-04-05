@@ -1,4 +1,4 @@
-"""Boucle principale de l'application : acquisition → vision → affichage."""
+"""Boucle principale de l'application : acquisition → vision → affichage → UDP."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import logging
 from ..capture.camera import OpenCvCamera
 from ..config.schema import AppConfig
 from ..domain.board import BoardCorners
+from ..network.udp_sender import UdpSender
 from ..ui.annotator import draw_cell_colors, draw_grid, draw_markers
 from ..ui.pygame_display import PygameDisplay
 from ..vision.board_detector import BoardDetector
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class AppLoop:
-    """Orchestre caméra, détection ArUco, rectification, classification et affichage."""
+    """Orchestre caméra, détection ArUco, rectification, classification, affichage et UDP."""
 
     def __init__(self, config: AppConfig, camera_index: int) -> None:
         self._config = config
@@ -32,6 +33,8 @@ class AppLoop:
         classifier = CellClassifier(self._config.colors)
         cam_config = dataclasses.replace(self._config.camera, index=self._camera_index)
 
+        color_names = list(self._config.colors.ranges.keys())
+
         # Dernier état persisté (maintenu en cas d'occlusion brève des marqueurs)
         last_rect:        RectificationResult | None = None
         last_grid_colors: list[list[str | None]] | None = None
@@ -42,28 +45,42 @@ class AppLoop:
                 return
 
             with PygameDisplay(self._config.window) as display:
-                running = True
-                while running:
-                    ok, frame = camera.read()
-                    if not ok:
-                        logger.warning("Frame vide reçue — lecture ignorée")
-                        continue
+                udp_enabled = self._config.udp.enabled
+                sender = (
+                    UdpSender(self._config.udp, self._config.grid, color_names)
+                    if udp_enabled else None
+                )
+                try:
+                    running = True
+                    while running:
+                        ok, frame = camera.read()
+                        if not ok:
+                            logger.warning("Frame vide reçue — lecture ignorée")
+                            continue
 
-                    # --- Vision ---
-                    markers = detector.detect(frame)
-                    corners = BoardCorners.from_markers(markers)
+                        # --- Vision ---
+                        markers = detector.detect(frame)
+                        corners = BoardCorners.from_markers(markers)
 
-                    if corners is not None:
-                        last_rect        = rectifier.compute(corners)
-                        rectified        = rectifier.rectify(frame, last_rect)
-                        last_grid_colors = classifier.classify_grid(rectified, splitter)
+                        if corners is not None:
+                            last_rect        = rectifier.compute(corners)
+                            rectified        = rectifier.rectify(frame, last_rect)
+                            last_grid_colors = classifier.classify_grid(rectified, splitter)
 
-                    # --- Annotation (ordre : couleurs → grille → marqueurs) ---
-                    annotated = frame.copy()
-                    if last_rect is not None and last_grid_colors is not None:
-                        annotated = draw_cell_colors(annotated, last_rect, last_grid_colors)
-                        annotated = draw_grid(annotated, last_rect)
-                    annotated = draw_markers(annotated, markers)
+                        # --- UDP ---
+                        if sender is not None:
+                            sender.maybe_send(last_grid_colors)
 
-                    display.show(annotated)
-                    running = display.handle_events()
+                        # --- Annotation (ordre : couleurs → grille → marqueurs) ---
+                        annotated = frame.copy()
+                        if last_rect is not None and last_grid_colors is not None:
+                            annotated = draw_cell_colors(annotated, last_rect, last_grid_colors)
+                            annotated = draw_grid(annotated, last_rect)
+                        annotated = draw_markers(annotated, markers)
+
+                        display.show(annotated)
+                        running = display.handle_events()
+
+                finally:
+                    if sender is not None:
+                        sender.close()

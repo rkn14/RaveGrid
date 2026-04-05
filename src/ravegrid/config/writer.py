@@ -56,6 +56,13 @@ def save(config: AppConfig, path: Path) -> None:
         if rng.h_max2 is not None:
             _kv(lines, "h_max2", rng.h_max2)
 
+    lines.append("")
+    _section(lines, "udp")
+    _kv(lines, "enabled", config.udp.enabled)
+    _kv(lines, "host",    config.udp.host, quote=True)
+    _kv(lines, "port",    config.udp.port)
+    _kv(lines, "rate_hz", config.udp.rate_hz)
+
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

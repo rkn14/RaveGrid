@@ -64,9 +64,19 @@ class ColorsConfig:
 
 
 @dataclass
+class UdpConfig:
+    """Paramètres d'envoi de l'état de la grille par UDP (JSON)."""
+    host:    str   = "127.0.0.1"
+    port:    int   = 9000
+    rate_hz: float = 10.0    # envois par seconde
+    enabled: bool  = True
+
+
+@dataclass
 class AppConfig:
     camera: CameraConfig = field(default_factory=CameraConfig)
     window: WindowConfig = field(default_factory=WindowConfig)
     aruco: ArucoConfig = field(default_factory=ArucoConfig)
     grid: GridConfig = field(default_factory=GridConfig)
     colors: ColorsConfig = field(default_factory=ColorsConfig)
+    udp: UdpConfig = field(default_factory=UdpConfig)

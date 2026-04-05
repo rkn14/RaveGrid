@@ -9,7 +9,7 @@ try:
 except ImportError:
     import tomli as tomllib  # type: ignore[no-redef]
 
-from .schema import AppConfig, ArucoConfig, CameraConfig, ColorRangeConfig, ColorsConfig, GridConfig, WindowConfig
+from .schema import AppConfig, ArucoConfig, CameraConfig, ColorRangeConfig, ColorsConfig, GridConfig, UdpConfig, WindowConfig
 
 _DEFAULT_PATH = Path("config.toml")
 
@@ -28,13 +28,15 @@ def load(path: Path | None = None) -> AppConfig:
     aruco_data  = data.get("aruco", {})
     grid_data   = data.get("grid", {})
     colors_data = data.get("colors", {})
+    udp_data    = data.get("udp", {})
 
     return AppConfig(
-        camera=CameraConfig(**cam_data)    if cam_data   else CameraConfig(),
-        window=WindowConfig(**win_data)    if win_data   else WindowConfig(),
+        camera=CameraConfig(**cam_data)    if cam_data  else CameraConfig(),
+        window=WindowConfig(**win_data)    if win_data  else WindowConfig(),
         aruco=ArucoConfig(**aruco_data)    if aruco_data else ArucoConfig(),
         grid=GridConfig(**grid_data)       if grid_data  else GridConfig(),
         colors=_parse_colors(colors_data),
+        udp=UdpConfig(**udp_data)          if udp_data  else UdpConfig(),
     )
 
 
